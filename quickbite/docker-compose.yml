@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database Store
+  postgres:
+    image: postgres:15-alpine
+    container_name: quickbite-postgres
+    environment:
+      POSTGRES_USER: quickbite_user
+      POSTGRES_PASSWORD: quickbite_secure_pass
+      POSTGRES_DB: quickbite_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quickbite_user -d quickbite_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Restaurant Catalogue Service
+  restaurant-service:
+    build: ./backend/restaurant-service
+    container_name: quickbite-restaurant-service
+    ports:
+      - "8081:8081"
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_DB: quickbite_db
+      DATABASE_USERNAME: quickbite_user
+      DATABASE_PASSWORD: quickbite_secure_pass
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # 3. Order Transaction Service
+  order-service:
+    build: ./backend/order-service
+    container_name: quickbite-order-service
+    ports:
+      - "8082:8082"
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_DB: quickbite_db
+      DATABASE_USERNAME: quickbite_user
+      DATABASE_PASSWORD: quickbite_secure_pass
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # 4. Simulated Notification Service
+  notification-service:
+    build: ./backend/notification-service
+    container_name: quickbite-notification-service
+    ports:
+      - "8083:8083"
+
+  # 5. React Frontend Service
+  frontend:
+    build: ./frontend
+    container_name: quickbite-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - restaurant-service
+      - order-service
+      - notification-service
+
+volumes:
+  pgdata:

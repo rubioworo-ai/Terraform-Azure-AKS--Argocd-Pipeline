@@ -1,0 +1,6 @@
+{
+  "name": "QuickBite",
+  "description": "A simple and elegant full-stack food delivery web application that allows users to browse featured restaurants, explore menus, add items to their cart, and place orders with real-time status updates and notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
