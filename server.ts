@@ -1,6 +1,12 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
+import { Pool } from "pg";
+
+// Initialize Postgres
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 const app = express();
 const PORT = 3000;
@@ -398,7 +404,6 @@ const foodItems = [
 ];
 
 // Mock Databases
-const orders: any[] = [];
 const notifications: any[] = [];
 
 // API - Restaurant Endpoints
@@ -413,49 +418,45 @@ app.get("/api/restaurants/:id/menu", (req, res) => {
 });
 
 // API - Order Endpoints
-app.post("/api/orders", (req, res) => {
+app.post("/api/orders", async (req, res) => {
   const { customer_name, food_item, quantity, totalPrice } = req.body;
 
   if (!customer_name || !food_item) {
     return res.status(400).json({ error: "customer_name and food_item are required." });
   }
 
-  const newOrder = {
-    id: orders.length + 1001,
-    customer_name,
-    food_item,
-    quantity: quantity || 1,
-    status: "PENDING",
-    totalPrice: totalPrice || 0.0,
-    createdAt: new Date().toISOString()
-  };
-
-  orders.push(newOrder);
-  console.log(`[Order Service] Order #${newOrder.id} placed by ${customer_name}`);
-
-  res.status(201).json(newOrder);
+  try {
+    const query = `
+      INSERT INTO orders (customer_name, food_item, quantity, status, total_price, created_at)
+      VALUES ($1, $2, $3, 'PENDING', $4, NOW())
+      RETURNING id;
+    `;
+    const values = [customer_name, food_item, quantity || 1, totalPrice || 0.0];
+    
+    const result = await pool.query(query, values);
+    
+    console.log(`[Order Service] Order #${result.rows[0].id} placed by ${customer_name}`);
+    res.status(201).json({ id: result.rows[0].id, ...req.body });
+  } catch (error) {
+    console.error("Error saving order:", error);
+    res.status(500).json({ error: "Failed to save order" });
+  }
 });
 
-app.get("/api/orders/:id", (req, res) => {
-  const orderId = parseInt(req.params.id);
-  const order = orders.find((o) => o.id === orderId);
+app.get("/api/orders/:id", async (req, res) => {
+  try {
+    const query = 'SELECT * FROM orders WHERE id = $1';
+    const result = await pool.query(query, [req.params.id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
 
-  if (!order) {
-    return res.status(404).json({ error: "Order not found" });
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ error: "Failed to fetch order" });
   }
-
-  // Dynamic status update logic to simulate real-time tracking
-  const elapsedSeconds = (new Date().getTime() - new Date(order.createdAt).getTime()) / 1000;
-  
-  if (elapsedSeconds > 60) {
-    order.status = "DELIVERED";
-  } else if (elapsedSeconds > 35) {
-    order.status = "OUT_FOR_DELIVERY";
-  } else if (elapsedSeconds > 12) {
-    order.status = "PREPARING";
-  }
-
-  res.json(order);
 });
 
 // API - Notification Endpoints
