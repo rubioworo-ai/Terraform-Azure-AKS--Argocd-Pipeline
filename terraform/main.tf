@@ -4,17 +4,25 @@ resource "azurerm_resource_group" "main" {
 }
 
 module "network" {
-  source   = "./modules/network"
-  rg_name  = azurerm_resource_group.main.name
-  location = azurerm_resource_group.main.location
+  source = "./modules/network"
+
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+
+  vnet_name          = "app-vnet"
+  vnet_address_space = ["10.0.0.0/16"]
+  subnet_name        = "frontend-subnet"
+  subnet_address     = ["10.0.1.0/24"]
 }
 
 module "compute" {
-  source              = "./modules/compute"
-  rg_name             = azurerm_resource_group.main.name
+  source = "./modules/compute"
+
+  resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  public_subnet_id    = module.network.public_subnet_id
-  nsg_id              = module.network.nsg_id
+
+  subnet_id = module.network.public_subnet_id
+
   admin_username      = "adminuser"
   ssh_public_key_path = "~/.ssh/id_rsa.pub"
 }
