@@ -1,4 +1,4 @@
-name: Gitleaks Secret Scan (Docker)
+name:  gitaction workflow  build and deploy to aks 
 
 on:
   push:
