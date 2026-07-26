@@ -16,16 +16,18 @@ module "network" {
 }
 
 module "compute" {
-  source = "./modules/compute"
+  source              = "./modules/compute"
 
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
-  subnet_id = module.network.public_subnet_id
+  subnet_id           = module.network.public_subnet_id
+  nsg_id              = module.network.nsg_id
 
   admin_username      = "adminuser"
   ssh_public_key_path = "~/.ssh/id_rsa.pub"
 }
+
 
 module "database" {
   source            = "./modules/database"
@@ -33,3 +35,4 @@ module "database" {
   location          = azurerm_resource_group.main.location
   private_subnet_id = module.network.private_subnet_id
 }
+1
