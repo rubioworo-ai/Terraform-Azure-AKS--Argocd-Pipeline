@@ -68,3 +68,35 @@ jobs:
         with:
           name: checkov-terraform-report
           path: checkov-terraform-report.json
+
+  checkov_scan_Dockerfile:
+  name: Checkov Dockerfile Scan
+  needs: gitleaks-docker
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install Checkov
+      run: pip install checkov
+
+    - name: Run Checkov on Dockerfiles
+      run: |
+        checkov \
+          -d ./ \
+          --framework dockerfile \
+          --output json \
+          > checkov-dockerfile-report.json || true
+
+    - name: Upload Checkov Dockerfile Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkov-dockerfile-report
+        path: checkov-dockerfile-report.json
+
