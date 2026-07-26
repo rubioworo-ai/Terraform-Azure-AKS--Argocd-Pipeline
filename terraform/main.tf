@@ -35,4 +35,3 @@ module "database" {
   location          = azurerm_resource_group.main.location
   private_subnet_id = module.network.private_subnet_id
 }
-1
