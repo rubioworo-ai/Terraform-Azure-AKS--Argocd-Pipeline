@@ -12,6 +12,7 @@ on:
 
 jobs:
   gitleaks-docker:
+    name: gitleaks-docker-scan
     runs-on: ubuntu-latest
 
     steps:
@@ -37,3 +38,31 @@ jobs:
         with:
           name: gitleaks-report
           path: gitleaks-report.json
+  checkov_scan_terraform:
+   name: Terraform Security Scan (Checkov)
+   runs-on: ubuntu-latest
+   steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Terraform
+        run: |
+          checkov \
+            -d ./ \
+            --framework terraform \
+            --output json \
+            > checkov-terraform-report.json || true
+
+      - name: Upload Checkov Terraform Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-terraform-report
+          path: checkov-terraform-report.json
