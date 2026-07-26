@@ -1,4 +1,4 @@
-name:  gitaction workflow  build and deploy to aks 
+name: gitaction workflow build and deploy to aks
 
 on:
   push:
@@ -11,12 +11,12 @@ on:
       - "server.ts"
 
 jobs:
+
   gitleaks-docker:
     name: gitleaks-docker-scan
     runs-on: ubuntu-latest
 
     steps:
-     
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -40,10 +40,11 @@ jobs:
           path: gitleaks-report.json
 
   checkov_scan_terraform:
-   name: Terraform Security Scan (Checkov)
-   needs: gitleaks-docker
-   runs-on: ubuntu-latest
-   steps:
+    name: Terraform Security Scan (Checkov)
+    needs: gitleaks-docker
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -70,33 +71,32 @@ jobs:
           path: checkov-terraform-report.json
 
   checkov_scan_Dockerfile:
-  name: Checkov Dockerfile Scan
-  needs: gitleaks-docker
-  runs-on: ubuntu-latest
+    name: Checkov Dockerfile Scan
+    needs: gitleaks-docker
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Install Checkov
-      run: pip install checkov
+      - name: Install Checkov
+        run: pip install checkov
 
-    - name: Run Checkov on Dockerfiles
-      run: |
-        checkov \
-          -d ./ \
-          --framework dockerfile \
-          --output json \
-          > checkov-dockerfile-report.json || true
+      - name: Run Checkov on Dockerfiles
+        run: |
+          checkov \
+            -d ./ \
+            --framework dockerfile \
+            --output json \
+            > checkov-dockerfile-report.json || true
 
-    - name: Upload Checkov Dockerfile Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: checkov-dockerfile-report
-        path: checkov-dockerfile-report.json
-
+      - name: Upload Checkov Dockerfile Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-dockerfile-report
+          path: checkov-dockerfile-report.json
