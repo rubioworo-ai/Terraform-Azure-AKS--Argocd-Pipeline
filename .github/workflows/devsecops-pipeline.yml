@@ -3,10 +3,18 @@ name: DevSecOps Pipeline
 on:
   push:
     branches:
-      - main
+      - qa-engineer
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'server.ts'
   pull_request:
     branches:
-      - main
+      - qa-engineer
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'server.ts'
 
 jobs:
   security-scan-secrets:
