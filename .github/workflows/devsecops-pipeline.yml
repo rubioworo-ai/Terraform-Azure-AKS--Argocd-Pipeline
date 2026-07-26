@@ -134,7 +134,9 @@ jobs:
 
   trivy_scan:
     name: Trivy FS + Dockerfile Scan
-    needs: checkov_scan_kubernetes
+    needs:
+      -  checkov_scan_kubernetes
+      -  gitleaks-docker
     runs-on: ubuntu-latest
 
     steps:
