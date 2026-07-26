@@ -38,8 +38,10 @@ jobs:
         with:
           name: gitleaks-report
           path: gitleaks-report.json
+
   checkov_scan_terraform:
    name: Terraform Security Scan (Checkov)
+   needs: gitleaks-docker
    runs-on: ubuntu-latest
    steps:
       - name: Checkout repository
