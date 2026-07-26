@@ -132,7 +132,7 @@ jobs:
           name: checkov-kubernetes-report
           path: checkov-kubernetes-report.json
 
-    trivy_scan:
+  trivy_scan:
     name: Trivy FS + Dockerfile Scan
     needs: checkov_scan_kubernetes
     runs-on: ubuntu-latest
