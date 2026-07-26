@@ -407,14 +407,34 @@ const foodItems = [
 const notifications: any[] = [];
 
 // API - Restaurant Endpoints
-app.get("/api/restaurants", (req, res) => {
-  res.json(restaurants);
+app.get("/api/restaurants", async (req, res) => {
+  try {
+    const query = `
+      SELECT id, name, location, description, rating, image, cuisine, delivery_time AS "deliveryTime"
+      FROM restaurant;
+    `;
+    const result = await pool.query(query);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch restaurants" });
+  }
 });
 
-app.get("/api/restaurants/:id/menu", (req, res) => {
+app.get("/api/restaurants/:id/menu", async (req, res) => {
   const restId = parseInt(req.params.id);
-  const menu = foodItems.filter((item) => item.restaurantId === restId);
-  res.json(menu);
+  try {
+    const query = `
+      SELECT id, restaurant_id AS "restaurantId", name, price, description, image, category
+      FROM food
+      WHERE restaurant_id = $1;
+    `;
+    const result = await pool.query(query, [restId]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch menu" });
+  }
 });
 
 // API - Order Endpoints
@@ -427,7 +447,7 @@ app.post("/api/orders", async (req, res) => {
 
   try {
     const query = `
-      INSERT INTO orders (customer_name, food_item, quantity, status, total_price, created_at)
+      INSERT INTO customer_order (customer_name, food_item, quantity, status, total_price, created_at)
       VALUES ($1, $2, $3, 'PENDING', $4, NOW())
       RETURNING id;
     `;
@@ -445,7 +465,7 @@ app.post("/api/orders", async (req, res) => {
 
 app.get("/api/orders/:id", async (req, res) => {
   try {
-    const query = 'SELECT * FROM orders WHERE id = $1';
+    const query = 'SELECT * FROM customer_order WHERE id = $1';
     const result = await pool.query(query, [req.params.id]);
     
     if (result.rows.length === 0) {
