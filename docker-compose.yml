@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: quickbite_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quickbite_user -d quickbite_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: root-app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://admin:admin@postgres:5432/quickbite_db"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
