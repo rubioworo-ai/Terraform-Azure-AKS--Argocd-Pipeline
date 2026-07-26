@@ -132,3 +132,43 @@ jobs:
           name: checkov-kubernetes-report
           path: checkov-kubernetes-report.json
 
+    trivy_scan:
+    name: Trivy FS + Dockerfile Scan
+    needs: checkov_scan_kubernetes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Trivy FS Scan (Code + Config + Packages)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: json
+          output: trivy-fs-report.json
+
+      - name: Upload Trivy FS Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report
+          path: trivy-fs-report.json
+
+   
+      - name: Trivy Dockerfile Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          scan-ref: Dockerfile
+          format: json
+          output: trivy-dockerfile-report.json
+
+      - name: Upload Trivy Dockerfile Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-dockerfile-report
+          path: trivy-dockerfile-report.json
+
+
