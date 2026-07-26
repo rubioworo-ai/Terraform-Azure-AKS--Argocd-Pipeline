@@ -102,7 +102,7 @@ jobs:
           path: checkov-dockerfile-report.json
 
     checkov_scan_kubernetes:
-    name: Checkov Kubernetes Manifest Scan
+    name: Checkov Kubernetes 
     needs: gitleaks-docker
     runs-on: ubuntu-latest
 
