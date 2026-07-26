@@ -100,3 +100,35 @@ jobs:
         with:
           name: checkov-dockerfile-report
           path: checkov-dockerfile-report.json
+
+    checkov_scan_kubernetes:
+    name: Checkov Kubernetes Manifest Scan
+    needs: gitleaks-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Kubernetes Manifests
+        run: |
+          checkov \
+            -d ./k8s \
+            --framework kubernetes \
+            --output json \
+            > checkov-kubernetes-report.json || true
+
+      - name: Upload Checkov Kubernetes Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-kubernetes-report
+          path: checkov-kubernetes-report.json
+
