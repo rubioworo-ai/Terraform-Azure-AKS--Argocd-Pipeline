@@ -6,8 +6,8 @@ on:
       - qa-engineer
     paths:
       - "Dockerfile"
-      - "src/*"
-      - "github/workflows/devsecops-pipeline*"
+      - "src/**"
+      - ".github/workflows/devsecops-pipeline*"
       - "server.ts"
 
 jobs:
