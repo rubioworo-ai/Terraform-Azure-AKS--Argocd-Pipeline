@@ -265,3 +265,34 @@ jobs:
         with:
           name: sbom
           path: sbom.json
+          
+  sbom_scan:
+    name: Trivy SBOM Scan
+    needs: sbom_generate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom
+
+      - name: Scan SBOM with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: sbom.json
+          scanners: vuln
+          vuln-type: library
+          format: json
+          output: trivy-sbom-report.json
+
+      - name: Upload SBOM Scan Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sbom-report
+          path: trivy-sbom-report.json
+
