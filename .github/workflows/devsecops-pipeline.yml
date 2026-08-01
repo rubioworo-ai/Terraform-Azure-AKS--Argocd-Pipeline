@@ -1,10 +1,9 @@
-
 name: gitaction workflow build and deploy to azure cloud 
 
 on:
   push:
     branches:
-      -  main 
+      - main
     paths:
       - "Dockerfile"
       - "src/**"
@@ -136,23 +135,22 @@ jobs:
   trivy_scan:
     name: Trivy FS + Dockerfile Scan
     needs:
-      -  checkov_scan_kubernetes
-      -  gitleaks-docker
+      - checkov_scan_kubernetes
+      - gitleaks-docker
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
       - name: Trivy FS Scan (Code + Config + Packages)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
-          format: json
           scanners: vuln,secret
-          skip-java-db-update: true
+          vuln-type: os
+          format: json
           output: trivy-fs-report.json
 
       - name: Upload Trivy FS Report
@@ -161,7 +159,6 @@ jobs:
           name: trivy-fs-report
           path: trivy-fs-report.json
 
-   
       - name: Trivy Dockerfile Scan
         uses: aquasecurity/trivy-action@master
         with:
@@ -175,11 +172,12 @@ jobs:
         with:
           name: trivy-dockerfile-report
           path: trivy-dockerfile-report.json
+
   lint_code:
     name: Linting Code (ESLint)
-    needs: 
-      -  checkov_scan_kubernetes
-      -  gitleaks-docker
+    needs:
+      - checkov_scan_kubernetes
+      - gitleaks-docker
     runs-on: ubuntu-latest
 
     steps:
@@ -197,7 +195,7 @@ jobs:
       - name: Run ESLint
         run: |
           npx eslint ./src --ext .ts,.tsx || true
-          npx eslint ./server.ts --ext .ts || true 
+          npx eslint ./server.ts --ext .ts || true
           npx eslint ./__tests__ --ext .ts,.tsx || true
 
       - name: Upload ESLint Report
@@ -232,9 +230,3 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v8.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-
-
-
-
-
