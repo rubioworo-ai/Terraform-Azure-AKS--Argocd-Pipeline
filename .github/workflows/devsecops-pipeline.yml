@@ -1,0 +1,239 @@
+
+name: gitaction workflow build and deploy to aks
+
+on:
+  push:
+    branches:
+      - qa-engineer
+      -  main 
+    paths:
+      - "Dockerfile"
+      - "src/**"
+      - ".github/workflows/devsecops-pipeline*"
+      - "server.ts"
+
+jobs:
+
+  gitleaks-docker:
+    name: gitleaks-docker-scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks Scan
+        run: |
+          echo "🔍 Running Gitleaks scan using Docker..."
+          docker run --rm \
+            -v "${{ github.workspace }}:/path" \
+            zricethezav/gitleaks:latest detect \
+            --source=/path \
+            --verbose \
+            --report-format=json \
+            --report-path=/path/gitleaks-report.json \
+            --redact \
+            --exit-code 1
+
+      - name: Upload Gitleaks Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+
+  checkov_scan_terraform:
+    name: Terraform Security Scan (Checkov)
+    needs: gitleaks-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Terraform
+        run: |
+          checkov \
+            -d ./ \
+            --framework terraform \
+            --output json \
+            > checkov-terraform-report.json || true
+
+      - name: Upload Checkov Terraform Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-terraform-report
+          path: checkov-terraform-report.json
+
+  checkov_scan_Dockerfile:
+    name: Checkov Dockerfile Scan
+    needs: gitleaks-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Dockerfiles
+        run: |
+          checkov \
+            -d ./ \
+            --framework dockerfile \
+            --output json \
+            > checkov-dockerfile-report.json || true
+
+      - name: Upload Checkov Dockerfile Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-dockerfile-report
+          path: checkov-dockerfile-report.json
+
+  checkov_scan_kubernetes:
+    name: Checkov Kubernetes 
+    needs: gitleaks-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Kubernetes Manifests
+        run: |
+          checkov \
+            -d ./k8s \
+            --framework kubernetes \
+            --output json \
+            > checkov-kubernetes-report.json || true
+
+      - name: Upload Checkov Kubernetes Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-kubernetes-report
+          path: checkov-kubernetes-report.json
+
+  trivy_scan:
+    name: Trivy FS + Dockerfile Scan
+    needs:
+      -  checkov_scan_kubernetes
+      -  gitleaks-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Trivy FS Scan (Code + Config + Packages)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: json
+          output: trivy-fs-report.json
+
+      - name: Upload Trivy FS Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report
+          path: trivy-fs-report.json
+
+   
+      - name: Trivy Dockerfile Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          scan-ref: Dockerfile
+          format: json
+          output: trivy-dockerfile-report.json
+
+      - name: Upload Trivy Dockerfile Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-dockerfile-report
+          path: trivy-dockerfile-report.json
+  lint_code:
+    name: Linting Code (ESLint)
+    needs: 
+      -  checkov_scan_kubernetes
+      -  gitleaks-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: |
+          npx eslint ./src --ext .ts,.tsx || true
+          npx eslint ./server.ts --ext .ts || true 
+          npx eslint ./__tests__ --ext .ts,.tsx || true
+
+      - name: Upload ESLint Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: eslint-report.json
+        if: always()
+
+  sonarqube_cloud_scan:
+    name: SonarCloud Scan
+    needs:
+      - lint_code
+      - trivy_scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v8.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+
+
+
+
