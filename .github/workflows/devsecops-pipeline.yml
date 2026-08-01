@@ -272,7 +272,6 @@ jobs:
   sbom_scan:
     name: Trivy SBOM Scan
     needs: 
-      - sbom_generate
       - sonarqube_cloud_scan
       - lint_code
       - trivy_scan
