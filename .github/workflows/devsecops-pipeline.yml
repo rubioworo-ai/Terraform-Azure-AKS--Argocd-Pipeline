@@ -152,6 +152,7 @@ jobs:
           scan-ref: .
           format: json
           scanners: vuln,secret
+          skip-java-db-update: true
           output: trivy-fs-report.json
 
       - name: Upload Trivy FS Report
