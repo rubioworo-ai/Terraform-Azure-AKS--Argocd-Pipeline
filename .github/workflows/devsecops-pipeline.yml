@@ -236,3 +236,26 @@ jobs:
         with:
           name: sonarcloud-scan-output
           path: .scannerwork
+
+  sbom_generate:
+    name: Generate SBOM (CycloneDX)
+    needs: sonarqube_cloud_scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install CycloneDX CLI
+        run: |
+          npm install -g @cyclonedx/cyclonedx-npm
+
+      - name: Generate SBOM
+        run: |
+          cyclonedx-npm --output-file sbom.json --output-format json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
