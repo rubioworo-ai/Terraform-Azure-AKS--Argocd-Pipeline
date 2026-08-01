@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
-<<<<<<< HEAD
-=======
     "esModuleInterop": true,
->>>>>>> qa-engineer
     "target": "ES2022",
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
