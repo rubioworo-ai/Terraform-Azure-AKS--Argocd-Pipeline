@@ -246,13 +246,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Dependencies
+        run: npm install
+
       - name: Install CycloneDX CLI
-        run: |
-          npm install -g @cyclonedx/cyclonedx-npm
+        run: npm install -g @cyclonedx/cyclonedx-npm
 
       - name: Generate SBOM
-        run: |
-          cyclonedx-npm --output-file sbom.json --output-format json
+        run: cyclonedx-npm --output-file sbom.json --output-format json
 
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
