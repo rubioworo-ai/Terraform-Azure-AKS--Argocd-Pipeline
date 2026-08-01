@@ -299,8 +299,8 @@ jobs:
           name: trivy-sbom-report
           path: trivy-sbom-report.json
 
-  docker_build:
-    name: Build Docker Image (No Push)
+  docker_build_and_scan:
+    name: Build Docker Image and Scan with Trivy (No Push)
     needs: sbom_scan
     runs-on: ubuntu-latest
 
@@ -318,15 +318,6 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: rukevweubio/quickbite:latest
-          
-  trivy_image_scan:
-    name: Trivy Image Scan
-    needs: docker_build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Scan Docker Image with Trivy
         uses: aquasecurity/trivy-action@master
@@ -341,4 +332,3 @@ jobs:
         with:
           name: trivy-image-report
           path: trivy-image-report.json
-
