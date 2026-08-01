@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - qa-engineer
+      -  main 
     paths:
       - "Dockerfile"
       - "src/**"
@@ -203,5 +204,34 @@ jobs:
           name: eslint-report
           path: eslint-report.json
         if: always()
+
+  sonarqube_cloud_scan:
+    name: SonarCloud Scan
+    needs:
+      - lint_code
+      - trivy_scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v8.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+
 
 
