@@ -16,3 +16,4 @@ coverage/
 =======
 .terraform/
 >>>>>>> qa-engineer
+firebase-applet-config.json
