@@ -265,6 +265,7 @@ jobs:
 
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: sbom
           path: sbom.json
@@ -276,7 +277,6 @@ jobs:
       - lint_code
       - trivy_scan
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
