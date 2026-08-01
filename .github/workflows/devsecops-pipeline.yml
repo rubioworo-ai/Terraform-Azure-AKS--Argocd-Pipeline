@@ -1,5 +1,5 @@
 
-name: gitaction workflow build and deploy to aks
+name: gitaction workflow build and deploy to azure cloud 
 
 on:
   push:
