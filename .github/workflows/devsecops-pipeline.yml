@@ -230,3 +230,9 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v8.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          
+      - name: Upload SonarCloud Scan Output
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonarcloud-scan-output
+          path: .scannerwork
