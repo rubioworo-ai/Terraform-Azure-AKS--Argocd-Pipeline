@@ -151,6 +151,7 @@ jobs:
           scan-type: fs
           scan-ref: .
           format: json
+          scanners: vuln,secret
           output: trivy-fs-report.json
 
       - name: Upload Trivy FS Report
