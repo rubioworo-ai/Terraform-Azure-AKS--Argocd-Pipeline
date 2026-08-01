@@ -239,7 +239,10 @@ jobs:
 
   sbom_generate:
     name: Generate SBOM (CycloneDX)
-    needs: sonarqube_cloud_scan
+    needs: 
+      - sonarqube_cloud_scan
+      - lint_code
+      - trivy_scan
     runs-on: ubuntu-latest
 
     steps:
@@ -265,10 +268,14 @@ jobs:
         with:
           name: sbom
           path: sbom.json
-          
+
   sbom_scan:
     name: Trivy SBOM Scan
-    needs: sbom_generate
+    needs: 
+      - sbom_generate
+      - sonarqube_cloud_scan
+      - lint_code
+      - trivy_scan
     runs-on: ubuntu-latest
 
     steps:
