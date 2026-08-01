@@ -318,3 +318,27 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: rukevweubio/quickbite:latest
+          
+  trivy_image_scan:
+    name: Trivy Image Scan
+    needs: docker_build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Scan Docker Image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: rukevweubio/quickbite:latest
+          format: json
+          output: trivy-image-report.json
+
+      - name: Upload Trivy Image Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-report
+          path: trivy-image-report.json
+
