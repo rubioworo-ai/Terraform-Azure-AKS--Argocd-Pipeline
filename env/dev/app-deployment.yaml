@@ -1,23 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quickbite-app
+  name: quickbite-app-dev
   namespace: dev
   labels:
-    app: quickbite-app
+    app: quickbite-app-dev
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: quickbite-app
+      app: quickbite-app-dev
   template:
     metadata:
       labels:
-        app: quickbite-app
+        app: quickbite-app-dev
     spec:
       containers:
       - name: app
-        image: quickbite-app:latest 
+        image:  devquickbite.azurecr.io/quickbite:latest
+
         ports:
         - containerPort: 3000
         env:

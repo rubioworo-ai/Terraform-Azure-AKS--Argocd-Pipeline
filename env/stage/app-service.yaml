@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: quickbite-app
+  name: quickbite-app-stage
   namespace: stage
 spec:
   selector:
-    app: quickbite-app
+    app: quickbite-app-stage
   ports:
     - protocol: TCP
       port: 80
