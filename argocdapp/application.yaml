@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-dev
+  namespace: argocd
+spec:
+  project: dev-project
+  source:
+    repoURL: https://github.com/rubioworo-ai/Terraform-Azure-AKS--Argocd-Pipeline.git
+    path: env/dev
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-stage
+  namespace: argocd
+spec:
+  project: stage-project
+  source:
+    repoURL: https://github.com/rubioworo-ai/Terraform-Azure-AKS--Argocd-Pipeline.git
+    path: env/stage
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: stage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-prod
+  namespace: argocd
+spec:
+  project: prod-project
+  source:
+    repoURL: https://github.com/rubioworo-ai/Terraform-Azure-AKS--Argocd-Pipeline.git
+    path: env/prod
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
