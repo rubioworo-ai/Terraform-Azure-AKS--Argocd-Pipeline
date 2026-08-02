@@ -1,7 +1,7 @@
 output "acr_login_server" {
-  value = azurerm_container_registry.main.login_server
-
+  value = module.acr.login_server
 }
+
 output "acr_id" {
-  value = azurerm_container_registry.main.id
+  value = module.acr.id
 }
