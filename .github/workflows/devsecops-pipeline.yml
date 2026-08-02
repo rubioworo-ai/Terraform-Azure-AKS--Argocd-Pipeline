@@ -389,4 +389,45 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: rukevweubio/quickbite:latest
+          
+  push_to_acr:
+    name: Push Image to Azure Container Registry
+    needs: trivy_image_scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name devquickbite
+
+      - name: Download Docker Image TAR
+        uses: actions/download-artifact@v4
+        with:
+          name: quickbite-image
+
+      - name: Load Docker Image
+        run: |
+          docker load -i quickbite-image.tar
+
+      - name: Tag Image for ACR
+        run: |
+          docker tag rukevweubio/quickbite:latest devquickbite.azurecr.io/quickbite:latest
+
+      - name: Push Image to ACR
+        run: |
+          docker push devquickbite.azurecr.io/quickbite:latest
+
+      - name: Show ACR Tags
+        run: |
+          az acr repository show-tags \
+            --name devquickbite \
+            --repository quickbite \
+            --output table
 
