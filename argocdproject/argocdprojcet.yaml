@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: dev-project
+  namespace: argocd
+spec:
+  description: Dev environment project
+  sourceRepos:
+    - https://github.com/rubioworo-ai/Terraform-Azure-AKS--Argocd-Pipeline.git
+  destinations:
+    - namespace: dev
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: stage-project
+  namespace: argocd
+spec:
+  description: Stage environment project
+  sourceRepos:
+    - https://github.com/rubioworo-ai/Terraform-Azure-AKS--Argocd-Pipeline.git
+  destinations:
+    - namespace: stage
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: prod-project
+  namespace: argocd
+spec:
+  description: Prod environment project
+  sourceRepos:
+    - https://github.com/rubioworo-ai/Terraform-Azure-AKS--Argocd-Pipeline.git
+  destinations:
+    - namespace: prod
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
