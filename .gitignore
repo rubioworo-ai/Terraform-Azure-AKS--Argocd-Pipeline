@@ -17,3 +17,9 @@ coverage/
 .terraform/
 >>>>>>> qa-engineer
 firebase-applet-config.json
+
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+
