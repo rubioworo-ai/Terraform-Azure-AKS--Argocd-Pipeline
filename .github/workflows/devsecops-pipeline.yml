@@ -317,13 +317,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build Docker Image (No Push)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          tags: rukevweubio/quickbite:latest
+        run: |
+          docker build -t rukevweubio/quickbite:latest -f Dockerfile .
 
       - name: Save Docker Image to TAR
         run: |
