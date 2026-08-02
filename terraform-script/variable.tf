@@ -11,7 +11,7 @@ variable "vnet_name" {
 }
 
 variable "subscription_id" {
-  type= string
+  type = string
 }
 
 variable "address_space" {
@@ -52,11 +52,11 @@ variable "vm_size" {
 }
 
 variable "admin_username" {
- type= string 
+  type = string
 }
 
 variable "admin_password" {
-  type = string 
+  type = string
 }
 
 variable "environment" {
