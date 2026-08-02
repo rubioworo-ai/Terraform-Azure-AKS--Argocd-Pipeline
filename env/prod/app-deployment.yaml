@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: app
-        image:  devquickbite.azurecr.io/quickbite:latest
+        image:  rukevweubio/quickbite:latest
 
         ports:
         - containerPort: 3000
