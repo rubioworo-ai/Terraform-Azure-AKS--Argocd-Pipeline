@@ -325,16 +325,4 @@ jobs:
           push: false
           tags: rukevweubio/quickbite:latest
 
-      - name: Scan Docker Image with Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: image
-          image-ref: rukevweubio/quickbite:latest
-          format: json
-          output: trivy-image-report.json
-
-      - name: Upload Trivy Image Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-image-report
-          path: trivy-image-report.json
+      
