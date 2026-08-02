@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: quickbite-app
-  namespace: quickbite
+  namespace: dev
   labels:
     app: quickbite-app
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: quickbite-app:latest # Replace with actual image tag in CI/CD
+        image: quickbite-app:latest 
         ports:
         - containerPort: 3000
         env:
