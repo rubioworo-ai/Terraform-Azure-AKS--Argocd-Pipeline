@@ -4,7 +4,7 @@ metadata:
   name: sample-app-rollout
   namespace: blue-green-demo
 spec:
-  replicas: 3
+  replicas: 5
   revisionHistoryLimit: 5
   selector:
     matchLabels:
@@ -24,10 +24,13 @@ spec:
             cpu: 50m
             memory: 64Mi
   strategy:
-    blueGreen:
-      activeService: sample-app-active
-      previewService: sample-app-preview
-      autoPromotionEnabled: false
+    canary:
+      steps:
+      - setWeight: 20   
+      - pause: {}      
+      - setWeight: 60  
+      - pause:
+          duration: 30s
 ---
 apiVersion: v1
 kind: Service
