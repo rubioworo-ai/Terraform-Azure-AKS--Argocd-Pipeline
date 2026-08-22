@@ -5,7 +5,7 @@ metadata:
   namespace: blue-green-demo
 spec:
   replicas: 3
-  revisionHistoryLimit: 3
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: sample-app
@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
       - name: web
-        image: nginx:1.25-alpine
+        image: quay.io/ubiowororuki/mypython-app:latest 
         ports:
-        - containerPort: 80
+        - containerPort: 5000
         resources:
           requests:
             cpu: 50m
@@ -36,8 +36,8 @@ metadata:
   namespace: blue-green-demo
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+  - port: 5000
+    targetPort: 5000
     name: http
   selector:
     app: sample-app
@@ -49,8 +49,8 @@ metadata:
   namespace: blue-green-demo
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+  - port: 5000
+    targetPort: 5000
     name: http
   selector:
     app: sample-app
