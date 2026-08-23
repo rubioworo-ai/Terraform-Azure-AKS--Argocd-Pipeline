@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: sample-app-rollout
+  name: sample-app
   namespace: blue-green-demo
 spec:
   replicas: 5
