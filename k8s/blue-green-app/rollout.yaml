@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: argoproj/rollouts-demo:blue
+        image: argoproj/rollouts-demo:yellow
         ports:
         - containerPort: 5000
         resources:
