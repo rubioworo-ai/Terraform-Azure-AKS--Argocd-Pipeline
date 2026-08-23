@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: quay.io/ubiowororuki/mypython-app:latest 
+        image: argoproj/rollouts-demo:blue
         ports:
         - containerPort: 5000
         resources:
